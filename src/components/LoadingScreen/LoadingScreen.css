@@ -1,0 +1,11 @@
+.LoadingScreen {
+  align-items: center;
+  background-color: inherit;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 1001;
+}
