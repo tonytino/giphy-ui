@@ -1,3 +1,4 @@
+import GifPreview from './GifPreview/GifPreview';
 import LoadingScreen from './LoadingScreen/LoadingScreen';
 
-export { LoadingScreen };
+export { GifPreview, LoadingScreen };
