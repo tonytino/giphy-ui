@@ -8,6 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.fetchMoreGifs = this.fetchMoreGifs.bind(this);
+    this.submitSearchOnEnter = this.submitSearchOnEnter.bind(this);
   }
 
   componentDidMount() {
@@ -19,20 +20,71 @@ class App extends Component {
   }
 
   fetchMoreGifs() {
-    const { getTrendingGifs, loadingMore, moreGifsAvailable } = appStore;
+    const { getGifs, loadingMore, moreGifsAvailable } = appStore;
     if (!loadingMore && moreGifsAvailable) {
       const { innerHeight, scrollY } = window;
       const { offsetHeight: heightOfBody } = document.body;
       const usersLocation = innerHeight + scrollY;
       const locationToFetchMoreGifsAt = heightOfBody - 200;
       const shouldFetchMoreGifs = usersLocation >= locationToFetchMoreGifsAt;
-      if (shouldFetchMoreGifs) getTrendingGifs(true);
+      if (shouldFetchMoreGifs) getGifs(true);
+    }
+  }
+
+  submitSearchOnEnter(event) {
+    const { clearGifs, getGifs, searchText } = appStore;
+    if (event.key === 'Enter' && searchText) {
+      clearGifs();
+      getGifs();
     }
   }
 
   renderLoadingScreen() {
     const { loading } = appStore;
     return <LoadingScreen loading={loading} />;
+  }
+
+  renderSearchBar() {
+    const {
+      clearGifs,
+      getGifs,
+      searchText,
+      setEndpoint,
+      setSearchText,
+    } = appStore;
+    return (
+      <header className="SearchBar">
+        <input
+          className="SearchInput"
+          type="text"
+          value={searchText}
+          placeholder="Search Giphy"
+          onChange={(evt) => {
+            const searchText = evt.target.value;
+            if (!searchText) {
+              setEndpoint('trending');
+              clearGifs();
+              getGifs();
+            } else {
+              setEndpoint('search');
+            }
+            setSearchText(searchText);
+          }}
+          onKeyPress={this.submitSearchOnEnter}
+        />
+        <button
+          className="SearchButton"
+          onClick={() => {
+            if (searchText) {
+              clearGifs();
+              getGifs();
+            }
+          }}
+        >
+          Search
+        </button>
+      </header>
+    );
   }
 
   renderGifs() {
@@ -92,6 +144,7 @@ class App extends Component {
     return (
       <div className="App">
         {this.renderLoadingScreen()}
+        {this.renderSearchBar()}
         {this.renderGifs()}
         {this.renderGifModal()}
         {this.renderLoadingMore()}

@@ -5,11 +5,12 @@ const API_KEY = process.env.REACT_APP_GIPHY_API_KEY;
 
 class AppStore {
   constructor() {
-    this.getTrendingGifs();
+    this.getGifs();
   }
 
   // OBSERVABLES
 
+  endpoint = "trending";
   gifs = [];
   idOfGifInModal = "";
   loading = false;
@@ -20,18 +21,22 @@ class AppStore {
   //   "offset": 0
   // },
   pagination = {};
+  searchText = "";
 
   // ACTIONS
 
-  // https://developers.giphy.com/docs/#operation--gifs-trending-get
-  async getTrendingGifs(getMore = false) {
-    const { gifs, requestParams } = this;
-    const endpoint = `trending${requestParams}`;
+  clearGifs() {
+    this.gifs = [];
+  }
+
+  async getGifs(getMore = false) {
+    const { endpoint, gifs, requestParams } = this;
+    const endpointAndParams = `${endpoint}${requestParams}`;
 
     if (getMore) this.loadingMore = true
     else this.loading = true;
 
-    const data = await this.getData(endpoint);
+    const data = await this.getData(endpointAndParams);
     let { data: fetchedGifs = [], pagination = {} } = data || {};
 
     if (getMore) fetchedGifs = [...gifs, ...fetchedGifs];
@@ -50,6 +55,14 @@ class AppStore {
 
   closeGifModal() {
     this.idOfGifInModal = "";
+  }
+
+  setEndpoint(endpoint = "trending") {
+    this.endpoint = endpoint;
+  }
+
+  setSearchText(text = "") {
+    this.searchText = text;
   }
 
   // COMPUTED
@@ -72,8 +85,10 @@ class AppStore {
   }
 
   get requestParams() {
-    const { countOfGifs = 0 } = this;
-    return `?api_key=${API_KEY}&offset=${countOfGifs}&limit=25&json=true`;
+    const { countOfGifs = 0, endpoint, searchText } = this;
+    let searchQuery = '';
+    if (endpoint === 'search') searchQuery = `&q=${searchText}`;
+    return `?api_key=${API_KEY}&offset=${countOfGifs}${searchQuery}&limit=25&json=true`;
   }
 
   // HELPERS
@@ -92,16 +107,21 @@ class AppStore {
 
 decorate(AppStore, {
   // OBSERVABLES
+  endpoint: observable,
   gifs: observable,
   idOfGifInModal: observable,
   loading: observable,
   loadingMore: observable,
   pagination: observable,
+  searchText: observable,
 
   // ACTIONS
-  getTrendingGifs: action.bound,
+  clearGifs: action.bound,
+  getGifs: action.bound,
   openGifModal: action.bound,
   closeGifModal: action.bound,
+  setEndpoint: action.bound,
+  setSearchText: action.bound,
 
   // COMPUTED
   countOfGifs: computed,
