@@ -1,4 +1,4 @@
-import { action, decorate, observable, runInAction } from 'mobx';
+import { action, computed, decorate, observable, runInAction } from 'mobx';
 import axios from 'axios';
 axios.defaults.baseURL = 'https://api.giphy.com/v1/gifs/';
 const API_KEY = process.env.REACT_APP_GIPHY_API_KEY;
@@ -12,19 +12,54 @@ class AppStore {
 
   gifs = [];
   loading = false;
+  loadingMore = false;
+  // "pagination": {
+  //   "total_count": 109260,
+  //   "count": 25,
+  //   "offset": 0
+  // },
+  pagination = {};
 
   // ACTIONS
 
   // https://developers.giphy.com/docs/#operation--gifs-trending-get
-  async getTrendingGifs() {
-    const endpoint = `trending?api_key=${API_KEY}&limit=25&json=true`;
-    this.loading = true;
+  async getTrendingGifs(getMore = false) {
+    const { gifs, requestParams } = this;
+    const endpoint = `trending${requestParams}`;
+
+    if (getMore) this.loadingMore = true
+    else this.loading = true;
+
     const data = await this.getData(endpoint);
-    const { data: gifs = [] } = data || {};
+    let { data: fetchedGifs = [], pagination = {} } = data || {};
+
+    if (getMore) fetchedGifs = [...gifs, ...fetchedGifs];
+
     runInAction(() => {
-      this.gifs = gifs;
-      this.loading = false;
+      this.gifs = fetchedGifs;
+      this.pagination = pagination;
+      if (getMore) this.loadingMore = false
+      else this.loading = false;
     });
+  }
+
+  // COMPUTED
+
+  get countOfGifs() {
+    const { gifs = [] } = this;
+    return gifs.length ? gifs.length : 0;
+  }
+
+  get requestParams() {
+    const { countOfGifs = 0 } = this;
+    return `?api_key=${API_KEY}&offset=${countOfGifs}&limit=25&json=true`;
+  }
+
+  // Returns boolean indicating whether all gifs available have been fetched
+  get moreGifsAvailable() {
+    const { countOfGifs, pagination } = this;
+    const { total_count: totalGifsAvailable = 0 } = pagination;
+    return countOfGifs <= totalGifsAvailable;
   }
 
   // HELPERS
@@ -45,9 +80,15 @@ decorate(AppStore, {
   // OBSERVABLES
   gifs: observable,
   loading: observable,
+  loadingMore: observable,
+  pagination: observable,
 
   // ACTIONS
   getTrendingGifs: action.bound,
+
+  // COMPUTED
+  countOfGifs: computed,
+  requestParams: computed,
 });
 
 const appStore = new AppStore();
