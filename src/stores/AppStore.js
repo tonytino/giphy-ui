@@ -11,6 +11,7 @@ class AppStore {
   // OBSERVABLES
 
   gifs = [];
+  idOfGifInModal = "";
   loading = false;
   loadingMore = false;
   // "pagination": {
@@ -43,6 +44,14 @@ class AppStore {
     });
   }
 
+  openGifModal(idOfGif = "") {
+    this.idOfGifInModal = idOfGif;
+  }
+
+  closeGifModal() {
+    this.idOfGifInModal = "";
+  }
+
   // COMPUTED
 
   get countOfGifs() {
@@ -50,9 +59,9 @@ class AppStore {
     return gifs.length ? gifs.length : 0;
   }
 
-  get requestParams() {
-    const { countOfGifs = 0 } = this;
-    return `?api_key=${API_KEY}&offset=${countOfGifs}&limit=25&json=true`;
+  get gifInModal() {
+    const { gifs = [], idOfGifInModal = "" } = this;
+    return gifs.find(gif => gif.id === idOfGifInModal);
   }
 
   // Returns boolean indicating whether all gifs available have been fetched
@@ -60,6 +69,11 @@ class AppStore {
     const { countOfGifs, pagination } = this;
     const { total_count: totalGifsAvailable = 0 } = pagination;
     return countOfGifs <= totalGifsAvailable;
+  }
+
+  get requestParams() {
+    const { countOfGifs = 0 } = this;
+    return `?api_key=${API_KEY}&offset=${countOfGifs}&limit=25&json=true`;
   }
 
   // HELPERS
@@ -79,15 +93,20 @@ class AppStore {
 decorate(AppStore, {
   // OBSERVABLES
   gifs: observable,
+  idOfGifInModal: observable,
   loading: observable,
   loadingMore: observable,
   pagination: observable,
 
   // ACTIONS
   getTrendingGifs: action.bound,
+  openGifModal: action.bound,
+  closeGifModal: action.bound,
 
   // COMPUTED
   countOfGifs: computed,
+  gifInModal: computed,
+  moreGifsAvailable: computed,
   requestParams: computed,
 });
 

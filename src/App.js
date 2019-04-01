@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
-import { GifPreview, LoadingMore, LoadingScreen } from './components';
+import { GifModal, GifPreview, LoadingMore, LoadingScreen } from './components';
 import appStore from './stores/AppStore';
 import './App.css';
 
@@ -43,6 +43,7 @@ class App extends Component {
   }
 
   renderGif(gif) {
+    const { openGifModal } = appStore;
     if (gif) {
       const { id, title, images = {} } = gif;
       const { fixed_width = {} } = images;
@@ -50,9 +51,32 @@ class App extends Component {
       return (
         <GifPreview
           key={id}
+          id={id}
           title={title}
           url={url}
           height={height}
+          width={width}
+          onClickHandler={openGifModal}
+        />
+      );
+    }
+  }
+
+  renderGifModal() {
+    const { gifInModal, closeGifModal } = appStore;
+    if (gifInModal) {
+      const { bitly_url, tags, create_datetime, title, images = {} } = gifInModal;
+      const { fixed_width = {} } = images;
+      const { url = "", height = "", width = "" } = fixed_width;
+      return (
+        <GifModal
+          bitly_url={bitly_url}
+          closeModalHandler={closeGifModal}
+          createdAt={create_datetime}
+          height={height}
+          tags={tags}
+          title={title}
+          url={url}
           width={width}
         />
       );
@@ -69,6 +93,7 @@ class App extends Component {
       <div className="App">
         {this.renderLoadingScreen()}
         {this.renderGifs()}
+        {this.renderGifModal()}
         {this.renderLoadingMore()}
       </div>
     );
