@@ -6,7 +6,7 @@ A simple web app for consuming trending gifs on Giphy.
 
 - List Trending
 
-- Expand Gif for more info
+- Expand Gif for more info (opens modal, can close modal via escape key)
 
 - CSS Responsive Layout supporting desktop, tablet, and mobile devices
 
