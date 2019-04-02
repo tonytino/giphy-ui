@@ -87,10 +87,42 @@ class App extends Component {
     );
   }
 
+  renderSortBar() {
+    const { gifs } = appStore;
+    if (!gifs.length) return null;
+    return (
+      <div className="SortBar">
+        <div className="SortButtons">
+          {this.renderSortButton('asc', 'Created Time ↑')}
+          {this.renderSortButton('desc', 'Created Time ↓')}
+        </div>
+      </div>
+    );
+  }
+
+  renderSortButton(sortDirection, buttonLabel) {
+    const { sortGifs } = appStore;
+    return (
+      <button
+        className="SortButton"
+        onClick={() => {
+          sortGifs(sortDirection);
+          window.scroll(0,0); // Scroll to the top after sorting
+        }}
+      >
+        {buttonLabel}
+      </button>
+    );
+  }
   renderGifs() {
     const { gifs } = appStore;
     if (gifs) {
-      return <div className="Gifs">{gifs.map(this.renderGif)}</div>;
+      return (
+        <div className="GifsContainer">
+          {this.renderSortBar()}
+          <div className="Gifs">{gifs.map(this.renderGif)}</div>
+        </div>
+      );
     }
   }
 

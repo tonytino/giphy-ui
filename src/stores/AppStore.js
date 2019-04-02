@@ -65,6 +65,20 @@ class AppStore {
     this.searchText = text;
   }
 
+  sortGifs(sortType) {
+    const { gifs } = this;
+    const sortedGifs = [...gifs].sort((gifA, gifB) => {
+      const gifACreatedTime = new Date(gifA.create_datetime);
+      const gifBCreatedTime = new Date(gifB.create_datetime);
+      if (sortType === "asc") {
+        return gifACreatedTime - gifBCreatedTime;
+      } else {
+        return gifBCreatedTime - gifACreatedTime;
+      }
+    });
+    this.gifs = sortedGifs;
+  }
+
   // COMPUTED
 
   get countOfGifs() {
@@ -122,6 +136,7 @@ decorate(AppStore, {
   closeGifModal: action.bound,
   setEndpoint: action.bound,
   setSearchText: action.bound,
+  sortGifs: action.bound,
 
   // COMPUTED
   countOfGifs: computed,
