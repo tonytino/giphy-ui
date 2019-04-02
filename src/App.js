@@ -15,7 +15,7 @@ class App extends Component {
     window.addEventListener('scroll', this.fetchMoreGifs);
   }
 
-  componentWillMount() {
+  componentWillUnmount() {
     window.removeEventListener('scroll', this.fetchMoreGifs);
   }
 
