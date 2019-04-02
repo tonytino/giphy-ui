@@ -91,11 +91,14 @@
   color: rgb(1, 56, 56);
   font-weight: 600;
   letter-spacing: 0.3px;
+  overflow-wrap: break-word;
   width: 7rem;
 }
 
 .GifModal .GifModalContent .GifModalBody .GifAttributes .GifAttribute .Value {
   color: rgb(1, 56, 56);
+  max-width: 50%;
+  overflow-wrap: break-word;
 }
 
 .GifModal .GifModalContent .GifModalBody .GifAttributes .GifAttribute .Value a {
