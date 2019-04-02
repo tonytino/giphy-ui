@@ -67,7 +67,7 @@ class AppStore {
 
   sortGifs(sortType) {
     const { gifs } = this;
-    const sortedGifs = [...gifs].sort((gifA, gifB) => {
+    const sortedGifs = gifs.slice().sort((gifA, gifB) => {
       const gifACreatedTime = new Date(gifA.create_datetime);
       const gifBCreatedTime = new Date(gifB.create_datetime);
       if (sortType === "asc") {
